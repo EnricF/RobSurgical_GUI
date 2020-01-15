@@ -163,6 +163,7 @@
     <ResourceCompile Include="RobSurgical_GUI.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\..\Desktop\rob-surgical.png" />
     <Image Include="RobSurgical_GUI.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
