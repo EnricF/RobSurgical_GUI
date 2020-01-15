@@ -1,10 +1,17 @@
 // RobSurgical_GUI.cpp : Defines the entry point for the application.
 //
 
+#include "pch.h"
 #include "framework.h"
 #include "RobSurgical_GUI.h"
 
+#include <stdio.h>
+#include <cwchar>
+#include <cstdio>
+
 #define MAX_LOADSTRING 100
+
+using namespace std;
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
@@ -16,6 +23,19 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+
+//EF mod
+//A code to create a default empty Edit Control
+HWND CreateTextBox(CONST INT iX, CONST INT iY, CONST UINT uWidth, CONST UINT uHeight, HWND hWnd, CONST UINT uId, HINSTANCE hInstance)
+{
+	HWND hWndRet = CreateWindowEx(WS_EX_CLIENTEDGE, TEXT("Edit"), NULL, WS_CHILD, iX, iY, (signed)uWidth, (signed)uHeight, hWnd, (HMENU)uId, hInstance, NULL);
+	SetBkColor(GetDC(hWndRet), RGB(0, 255, 255));
+	return hWndRet;
+}
+
+//Forward declaration
+bool createAppLayout(HWND *hWnd);
+//-----------------------------
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -105,6 +125,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
+   createAppLayout(&hWnd);//EF mod
+
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
@@ -147,9 +169,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
+
             EndPaint(hWnd, &ps);
         }
         break;
+
+	case WM_CTLCOLORSTATIC:
+		{
+		COLORREF crBk = RGB(255, 0, 0); // use RED for Background.
+		SetBkColor(GetDC(hWnd), crBk); // Set to red
+		}
+		break;
+	case WM_CTLCOLOREDIT:
+		break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -177,4 +209,304 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+bool createAppLayout(HWND *hWnd) {
+	int x = ix_start;//first col
+	int y = iy_start;//first row
+
+	//------------------Buttons control section (5th col)----------------------------
+	y += 4 * iy_inc;//Jump to 5th col
+
+	//Create a button: SEND
+	HWND hwndButton_Send = CreateWindow(
+		L"BUTTON",  // Predefined class; Unicode assumed 
+		L"SEND",	// Button text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,		// Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+
+	x += 3*ix_inc;//Jump to 4th row
+
+	 //Create a button: STOP
+	HWND hwndButton_Stop = CreateWindow(
+		L"BUTTON",  // Predefined class; Unicode assumed 
+		L"STOP",      // Button text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+
+	//----------------STATIC control section (first col)----------------------
+	x = ix_start;//first col
+	y = iy_start;//first row
+
+	HWND hwndText_ControlWordSend = CreateWindow(
+		L"STATIC",  // Predefined class; Unicode assumed 
+		L"Controlword",      // Text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+	SetBkColor(GetDC(hwndText_ControlWordSend), RGB(255, 255, 255));//White background
+	SetTextColor(GetDC(hwndText_ControlWordSend), RGB(0, 0, 0));//Black Text
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_TargetPositionSend = CreateWindow(
+		L"STATIC",  // Predefined class; Unicode assumed 
+		L"Target Position",      // Text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_TargetVelocitySend = CreateWindow(
+		L"STATIC",  // Predefined class; Unicode assumed 
+		L"Target Velocity",      // Text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_OperationModeSend = CreateWindow(
+		L"STATIC",  // Predefined class; Unicode assumed 
+		L"Operation Mode",      // Text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.		 
+	//---------------------------------------------------------
+
+
+	//---------------EDIT controls section (second col)-----------
+	x = ix_start + ix_inc;//second col
+	y = iy_start;//first row
+
+	HWND hwndText_ControlWordValueSend = CreateWindow(
+		L"EDIT",  // Predefined class; Unicode assumed 
+		editControlDefaultDecimal,      // default text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,   // Text width
+		defaultHeight,	// Text height
+		*hWnd,			// Parent window
+		NULL,			// No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);			// Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_TargetPositionValueSend = CreateWindow(
+		L"EDIT",  // Predefined class; Unicode assumed 
+		editControlDefaultDecimal,      // default text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,   // Text width
+		defaultHeight,	// Text height
+		*hWnd,			// Parent window
+		NULL,			// No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);			// Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_TargetVelocityValueSend = CreateWindow(
+		L"EDIT",  // Predefined class; Unicode assumed 
+		editControlDefaultDecimal,      // default text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,   // Text width
+		defaultHeight,	// Text height
+		*hWnd,			// Parent window
+		NULL,			// No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);			// Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_OperationModeValueSend = CreateWindow(
+		L"EDIT",  // Predefined class; Unicode assumed 
+		editControlDefaultDecimal,      // default text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,   // Text width
+		defaultHeight,	// Text height
+		*hWnd,			// Parent window
+		NULL,			// No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);			// Pointer not needed.
+	
+	//----------------STATIC control section (third col)----------------------
+	x = ix_start + 2*ix_inc;//first col
+	y = iy_start;//first row
+
+	HWND hwndText_StatusWordRcv = CreateWindow(
+		L"STATIC",  // Predefined class; Unicode assumed 
+		L"StatusWord",      // Text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_PositionActualRcv = CreateWindow(
+		L"STATIC",  // Predefined class; Unicode assumed 
+		L"Position actual",      // Text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_VelocityActualRcv = CreateWindow(
+		L"STATIC",  // Predefined class; Unicode assumed 
+		L"Velocity actual",      // Text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_OperationModeRcv = CreateWindow(
+		L"STATIC",  // Predefined class; Unicode assumed 
+		L"Operation Mode display",      // Text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,// Width
+		defaultHeight,// Height
+		*hWnd,     // Parent window
+		NULL,       // No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);      // Pointer not needed.		 
+	//---------------------------------------------------------
+	
+	//---------------EDIT controls section (fourth col)-----------
+	x = ix_start + 3*ix_inc;//fourth col
+	y = iy_start;//first row
+
+	HWND hwndText_StatusWordValueRcv = CreateWindow(
+		L"EDIT",  // Predefined class; Unicode assumed 
+		editControlDefaultDecimal,      // default text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,   // Text width
+		defaultHeight,	// Text height
+		*hWnd,			// Parent window
+		NULL,			// No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);			// Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_PositionActualValueRcv = CreateWindow(
+		L"EDIT",  // Predefined class; Unicode assumed 
+		editControlDefaultDecimal,      // default text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,   // Text width
+		defaultHeight,	// Text height
+		*hWnd,			// Parent window
+		NULL,			// No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);			// Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_VelocityActualValueRcv = CreateWindow(
+		L"EDIT",  // Predefined class; Unicode assumed 
+		editControlDefaultDecimal,      // default text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,   // Text width
+		defaultHeight,	// Text height
+		*hWnd,			// Parent window
+		NULL,			// No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);			// Pointer not needed.
+
+	y += iy_inc;//Jump one row
+
+	HWND hwndText_OperationModeValueRcv = CreateWindow(
+		L"EDIT",  // Predefined class; Unicode assumed 
+		editControlDefaultDecimal,      // default text 
+		WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_TEXT,  // Styles 
+		x,			// x position 
+		y,			// y position 
+		defaultWidth,   // Text width
+		defaultHeight,	// Text height
+		*hWnd,			// Parent window
+		NULL,			// No menu.
+		(HINSTANCE)GetWindowLong(*hWnd, GWL_HINSTANCE),
+		NULL);			// Pointer not needed.
+
+	//MessageBox sample
+	/*LPCWSTR a = L"TestWindow";
+	LPCWSTR b = L"TestTitleWindow";
+	MessageBox(hWnd, a, b, MB_OK | MB_ICONQUESTION);*/
+	
+
+	//TODO: return logics
+	return true;
 }
